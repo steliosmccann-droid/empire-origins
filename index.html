@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#101b20"><title>Empire Origins — Alpha 0.7</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Arial,sans-serif;--panel:#17252eeF;--edge:#68807b;--accent:#eac47d;--text:#f5f0de}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10232c;color:var(--text);touch-action:none;-webkit-tap-highlight-color:transparent}
+#game{display:block;width:100vw;height:100dvh;touch-action:none}
+#brand{position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:10px;z-index:4;padding:5px 9px;background:#13232be0;border:1px solid #a98b59a8;border-radius:11px;font-size:10px;letter-spacing:1.7px;font-weight:900;color:#f1d7a3;box-shadow:0 5px 15px #0018;pointer-events:none}
+#top{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 35px);z-index:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;pointer-events:none}
+.res{background:linear-gradient(160deg,#203a41ef,#111d29ef);border:1px solid #607e79;border-bottom-color:#a08351;border-radius:12px;padding:8px 2px;font-weight:800;font-size:clamp(11px,3.2vw,15px);box-shadow:0 4px 12px #0006;text-align:center;font-variant-numeric:tabular-nums;backdrop-filter:blur(12px)}
+#status{position:fixed;left:10px;right:10px;top:calc(env(safe-area-inset-top) + 83px);z-index:3;pointer-events:none;font-size:11px;text-align:center;color:#ecedda;text-shadow:0 2px 5px #001,0 1px 2px #001}
+#toolbar{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:4;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;background:linear-gradient(#263941f5,#131f2bf7);border:1px solid #708780;border-radius:18px;padding:9px;box-shadow:0 8px 28px #001b;backdrop-filter:blur(12px)}
+button{border:1px solid #627777;background:linear-gradient(165deg,#364d4f,#1b2d38);color:#f6f1db;border-radius:11px;padding:10px 6px;font-size:11px;font-weight:800;touch-action:manipulation;box-shadow:inset 0 1px #fff2,0 3px 7px #0005;min-height:40px}
+button:active{transform:translateY(1px)}button.active{background:linear-gradient(135deg,#527c60,#2e594f);border-color:#d8cf8b}button:disabled{opacity:.35}
+#raidBtn{border-color:#b6785c;background:linear-gradient(145deg,#784c44,#402f38)}#saveBtn{border-color:#ead091;background:linear-gradient(145deg,#806039,#473827)}
+#saveBtn:before{content:"";position:absolute}#panel .panel-actions .primary{background:linear-gradient(135deg,#6c7a4c,#345c4e);border-color:#c6d49b}#panel .help{border:1px solid #65806c;border-radius:12px;background:#152b30;padding:10px;line-height:1.5}#panel .panel-actions button{min-height:46px}#brand{background:linear-gradient(120deg,#233a3bec,#17232ced);border-color:#d6ac69}#toolbar{border-color:#a58a63}#selectedInfo{border-color:#c4a66d}
+#panel{position:fixed;z-index:5;bottom:calc(env(safe-area-inset-bottom) + 108px);left:10px;right:10px;max-width:500px;margin:auto;background:linear-gradient(#273942f8,#15242cfb);border:1px solid #b19869;border-radius:18px;padding:16px;box-shadow:0 15px 40px #000a;display:none;max-height:57dvh;overflow:auto;touch-action:pan-y}
+#panel.show{display:block}#panel h3{margin:0 0 10px;color:#f9d891;font-size:19px}#panel p{font-size:13px;color:#d6ded4;line-height:1.5}#panel button{margin:4px;padding:11px}#panel .panel-actions{display:flex;flex-wrap:wrap;gap:5px}#panel .panel-actions button{flex:1 1 125px}
+#hint{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 103px);z-index:2;text-align:center;font-size:10px;color:#f8f6e4;pointer-events:none;text-shadow:0 2px 5px #000}
+#toast{position:fixed;z-index:7;top:calc(env(safe-area-inset-top) + 113px);left:12%;right:12%;text-align:center;background:#1e4144f2;border:1px solid #93a67d;border-radius:12px;padding:11px;opacity:0;pointer-events:none;transition:opacity .2s;font-size:12px;box-shadow:0 6px 18px #0018}#toast.on{opacity:1}
+.small{font-size:11px;color:#b7cbbf}.line{height:1px;background:#61706e;margin:12px 0}
+#selectedInfo{position:fixed;right:8px;top:calc(env(safe-area-inset-top) + 106px);z-index:3;max-width:164px;padding:7px 10px;border-radius:10px;background:#132631dd;border:1px solid #6d8578;box-shadow:0 3px 8px #0006;font-size:11px;color:#f6e7bc;pointer-events:none;display:none}
+#selectedInfo.on{display:block}
+
+#manageBtn{border-color:#7eaa9a;background:linear-gradient(145deg,#315e5c,#173d47)}
+#panel .dashboard-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+#panel .dashboard-tabs button{margin:0;min-height:42px;padding:7px 2px;font-size:11px}
+#panel .dash-card{border:1px solid #617a73;background:#132b30;border-radius:13px;padding:11px;margin:9px 0}
+#panel .dash-card strong{color:#f2db9d;font-size:13px}
+#panel .dash-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:7px 0;font-size:12px}
+#panel .dash-muted{color:#b0c6bd;font-size:11px}
+#panel .dash-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+#panel .dash-actions button{margin:0;flex:1 1 70px;padding:8px 4px;min-height:36px;font-size:11px}
+#panel .dash-actions button.chosen{border-color:#dfce8e;background:#45664e}
+#panel .dash-progress{height:7px;border-radius:10px;overflow:hidden;background:#394b4a;margin-top:7px}
+#panel .dash-progress i{display:block;height:100%;background:#d4ae6c;border-radius:10px}
+#panel .dash-empty{padding:16px;text-align:center;color:#b0c6bd;font-size:12px}
+
+#accountBtn{position:fixed;z-index:6;top:calc(env(safe-area-inset-top) + 5px);right:9px;min-height:27px;padding:5px 10px;font-size:10px;border-color:#c4a56c;background:#253a3eeb}
+#panel input.account-field{display:block;width:100%;background:#0e2029;color:#fff;border:1px solid #839592;border-radius:10px;padding:12px;margin:8px 0 12px;font-size:16px;touch-action:manipulation}
+#panel .account-warning{border:1px solid #bd9463;border-radius:10px;padding:9px;background:#403024;color:#f9e6c1;font-size:12px;line-height:1.5}
+#panel .account-status{border:1px solid #658b7a;border-radius:10px;padding:10px;background:#162d2d;font-size:12px;word-break:break-word;line-height:1.5}
+</style></head>
+<body><canvas id="game"></canvas><div id="brand">♜ EMPIRE ORIGINS <span style="opacity:.62">α 0.7</span></div><button id="accountBtn" type="button">👤 Account</button><div id="top"><div class="res" id="wood">🪵 400</div><div class="res" id="stone">🪨 250</div><div class="res" id="food">🌾 300</div><div class="res" id="gold">🪙 100</div></div><div id="status"></div><div id="selectedInfo"></div><div id="hint">Tap a unit to select · tap ground to move · tap enemy to attack</div><div id="toolbar"><button id="workersBtn">👷 Workers</button><button id="buildBtn">🔨 Build</button><button id="recruitBtn">➕ Villager</button><button id="autoBtn">⚙️ Auto: ON</button><button id="armyBtn">🛡️ Army</button><button id="raidBtn">⚔️ Battle</button><button id="saveBtn">💾 Saves</button><button id="manageBtn">📊 Manage</button></div><div id="panel"></div><div id="toast"></div>
+<script>
+(()=>{'use strict';
+const C=document.getElementById('game'),ctx=C.getContext('2d',{alpha:false});const W=40,H=40,TW=54,TH=27,SAVE='empire-origins-alpha-01';
+const $=x=>document.getElementById(x);let managementTab='workers',managementOpen=false,lastManagementPaint=0;let cloudUser=null,cloudRev=0,cloudReady=false,cloudPending=false,cloudWorking=false,cloudLastSync=0,cloudBlocked=false,activeSaveKey=SAVE,cloudPaused=false;let state,selected=null,mode='select',buildingType=null,cam={x:0,y:0,z:1},drag=null,lastTime=performance.now(),lastAutosave=0,lastView=0,toastUntil=0, pinchDist=0;
+const unitTypes={sword:{name:'Swordsman',emoji:'🗡️',hp:110,attack:13,range:1.35,speed:1.05,interval:1.05,cost:{food:60,gold:20}},archer:{name:'Archer',emoji:'🏹',hp:65,attack:10,range:4.2,speed:1.15,interval:1.35,cost:{wood:40,food:40}},spear:{name:'Spearman',emoji:'🔱',hp:90,attack:12,range:1.6,speed:1.12,interval:1.1,cost:{wood:35,food:50}}};
+const BUILD_SECONDS={house:45,farm:55,storage:70,lumber:70,mine:85,barracks:120};
+const TRAIN_SECONDS={sword:30,archer:40,spear:35};
+const buildings={house:{name:'House',cost:{wood:80,stone:20},size:2,emoji:'🏠'},farm:{name:'Farm',cost:{wood:60,stone:20},size:2,emoji:'🌾'},storage:{name:'Storage',cost:{wood:100,stone:60},size:2,emoji:'📦'},lumber:{name:'Lumberyard',cost:{wood:100,stone:40},size:2,emoji:'🪓'},mine:{name:'Mine',cost:{wood:70,stone:80},size:2,emoji:'⛏️'},barracks:{name:'Barracks',cost:{wood:150,stone:100,gold:40},size:3,emoji:'⚔️'}};
+function rand(seed){let v=Math.sin(seed*127.1+seed*seed*0.017)*43758.5453;return v-Math.floor(v)}
+const tile=(x,y)=>state.tiles[y*W+x],inside=(x,y)=>x>=0&&y>=0&&x<W&&y<H;
+function newGame(){let tiles=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){let r=rand(y*W+x+34),dist=Math.hypot(x-20,y-20);let type= r<.14?'tree':r<.202?'rock':r<.221?'gold':'grass';if(dist<6)type='grass';tiles.push({type,amount:type==='tree'?48:type==='rock'?50:type==='gold'?42:0})}
+state={version:1,tiles,res:{wood:400,stone:250,food:300,gold:100},workers:[{id:1,x:19,y:19,task:null,carry:0,auto:true},{id:2,x:22,y:20,task:null,carry:0,auto:true},{id:3,x:20,y:23,task:null,carry:0,auto:true}],buildings:[{id:1,type:'town',x:19,y:20,size:3,hp:100},{id:2,type:'house',x:23,y:19,size:2,hp:100},{id:3,type:'storage',x:16,y:20,size:2,hp:100}],nextId:4,units:[],enemies:[],battle:0,victories:0,started:Date.now(),lastSimulatedAt:Date.now(),trainQueue:[],offlinePolicy:{autoWorkers:true}};}
+function save(silent=false){try{localStorage.setItem(activeSaveKey,JSON.stringify(state));if(!silent)toast('Empire saved on this device')}catch(e){toast('Unable to save: storage unavailable')}}
+function validSave(s){return !!(s&&s.version===1&&Array.isArray(s.tiles)&&s.tiles.length===W*H&&Array.isArray(s.workers)&&Array.isArray(s.buildings)&&s.res&&['wood','stone','food','gold'].every(k=>Number.isFinite(s.res[k])&&s.res[k]>=0)&&s.tiles.every(t=>t&&['tree','rock','gold','grass'].includes(t.type)&&Number.isFinite(t.amount))&&s.workers.every(w=>Number.isFinite(w.x)&&Number.isFinite(w.y)&&Number.isFinite(w.id))&&s.buildings.every(b=>Number.isFinite(b.x)&&Number.isFinite(b.y)&&Number.isFinite(b.id)&&Number.isFinite(b.size))&&(!s.units||Array.isArray(s.units))&&(!s.enemies||Array.isArray(s.enemies)))}
+function normalizeSave(s){s.units??=[];s.enemies??=[];s.battle??=0;s.victories??=0;s.trainQueue??=[];s.offlinePolicy??={autoWorkers:true};for(const w of s.workers){if(!['any','wood','stone','gold','manual'].includes(w.focus))w.focus=w.auto?'any':'manual'}s.lastSimulatedAt=Number.isFinite(s.lastSimulatedAt)?s.lastSimulatedAt:Date.now();for(let b of s.buildings){if(!Number.isFinite(b.readyAt))b.readyAt=0}let ids=[...s.workers,...s.buildings,...s.units,...s.enemies].map(x=>x.id||0);s.nextId=Math.max(s.nextId||1,...ids.map(n=>n+1));return s}
+function load(){try{let s=JSON.parse(localStorage.getItem(SAVE));if(validSave(s)){state=normalizeSave(s);return true}}catch(e){}newGame();return false}
+
+// Offline progress is timestamp-based: no background JS or server is required.
+// Production uses deterministic work cycles and depletes finite resource nodes.
+function isReady(b,at=Date.now()){return !b.readyAt||b.readyAt<=at}
+function storageCap(at=Date.now()){return 1000+state.buildings.filter(b=>b.type==='storage'&&isReady(b,at)).length*1500}
+function addCapped(resource,qty,at=Date.now()){
+  const allowed=Math.max(0,Math.min(qty,storageCap(at)-state.res[resource]));
+  state.res[resource]+=allowed;return allowed;
+}
+function activeBuildingCount(type,at=Date.now()){return state.buildings.filter(b=>b.type===type&&isReady(b,at)).length}
+function getResourceTask(w){
+  if(w.task?.type==='gather'&&inside(w.task.x,w.task.y)){
+    const t=tile(w.task.x,w.task.y);if(t.amount>0&&messageFor(t.type))return {x:w.task.x,y:w.task.y};
+  }
+  if(w.auto)return nearestSource(w,w.focus);
+  return null;
+}
+// Event-based simulation: one pass over finite node amounts and queue events,
+// rather than iterating seconds/days. For huge absences runtime stays bounded.
+function reconcileElapsed(now,report=true){
+  if(!Number.isFinite(now))return null;
+  const start=Number.isFinite(state.lastSimulatedAt)?state.lastSimulatedAt:now;
+  if(now<=start){state.lastSimulatedAt=now;return null}
+  let seconds=(now-start)/1000;
+  let gains={wood:0,stone:0,food:0,gold:0},completed=[],trained=[];
+  // Finish construction events in temporal order, allowing newly finished farms/storage
+  // to contribute during the remainder of the absence.
+  const events=[...new Set([start,now,...state.buildings.map(b=>b.readyAt).filter(t=>t>start&&t<now)])].sort((a,b)=>a-b);
+  let foodClock=Number.isFinite(state._farmClock)?Math.max(0,state._farmClock%10):0;
+  for(let i=0;i<events.length-1;i++){
+    const from=events[i],to=events[i+1],farms=activeBuildingCount('farm',from);
+    const total=foodClock+(to-from)/1000;
+    const cycles=Math.floor((total+1e-8)/10);
+    foodClock=total-cycles*10;
+    if(farms&&cycles){gains.food+=addCapped('food',cycles*farms*8,from)}
+  }
+  state._farmClock=foodClock;
+  for(const b of state.buildings){if(b.readyAt&&b.readyAt<=now){if(b.readyAt>start)completed.push(buildings[b.type]?.name||b.type);b.readyAt=0}}
+  // Active automatic workers can harvest finite tile deposits. Travel is a
+  // conservative estimate. Manual gather jobs are completed once then stop.
+  // Each worker advances only their own assigned deposit, preventing duplication.
+  for(const w of state.workers){
+    let budget=seconds;
+    if(w.task?.type==='move')continue;
+    let loops=0;
+    while(budget>2.2&&loops++<W*H+2){
+      let target=getResourceTask(w);if(!target)break;
+      const node=tile(target.x,target.y),res=messageFor(node.type);
+      if(!res||node.amount<=0)break;
+      if(state.res[res]>=storageCap(now))break;
+      const distance=Math.hypot(w.x-target.x,w.y-target.y);
+      const travel=distance/1.4;
+      let firstCost=travel+Math.max(0,2.2-(w.task?.progress||0));
+      if(budget<firstCost)break;
+      let cycles=1+Math.floor(Math.max(0,budget-firstCost)/2.2);
+      let possible=Math.min(node.amount,cycles*5,Math.max(0,storageCap(now)-state.res[res]));
+      let harvested=addCapped(res,possible,now);
+      if(harvested<=0)break;
+      gains[res]+=harvested;
+      node.amount-=harvested;
+      if(node.amount<=0){node.type='grass';node.amount=0}
+      const usedCycles=Math.ceil(harvested/5);
+      budget-=travel+usedCycles*2.2;
+      w.x=target.x;w.y=target.y;w.task=null;
+      if(!w.auto)break;
+    }
+  }
+  // Training queues are paid at order time. Only ready barracks can train;
+  // finished soldiers appear next to their assigned barracks.
+  let keep=[];
+  for(const q of state.trainQueue){
+    if(q.readyAt>now){keep.push(q);continue}
+    const def=unitTypes[q.type],b=state.buildings.find(b=>b.id===q.barracksId);
+    if(def&&b&&isReady(b,now)){
+      state.units.push(healthUnit(null,q.type,{x:Math.min(W-1,b.x+b.size),y:Math.min(H-1,b.y+b.size)}));trained.push(def.name);
+    }else{
+      // Queue remains pending if training facility is missing.
+      keep.push({...q,readyAt:now+TRAIN_SECONDS[q.type]*1000});
+    }
+  }
+  state.trainQueue=keep;
+  state.lastSimulatedAt=now;
+  if(!report||seconds<2)return null;
+  return {seconds,gains,completed,trained};
+}
+function showOfflineReport(r){
+  if(!r)return;
+  const duration=r.seconds>=86400?`${(r.seconds/86400).toFixed(1)} days`:`${(r.seconds/3600).toFixed(1)} hours`;
+  const amounts=Object.entries(r.gains).map(([k,v])=>`${k}: +${Math.floor(v)}`).join(' · ');
+  let html=`<div class="help">Away for <b>${duration}</b>. There is no time cap. Resources stop at storage limits or exhausted nodes. Battles do not advance while closed.</div><p>${amounts}</p>`;
+  if(r.completed.length)html+=`<p>🏗️ Completed: ${r.completed.join(', ')}</p>`;
+  if(r.trained.length)html+=`<p>🛡️ Trained: ${r.trained.join(', ')}</p>`;
+  showPanel('🌙 Offline Progress',html);
+}
+function exportBackup(){
+  save(true);
+  const filename='empire-origins-'+new Date().toISOString().slice(0,10)+'.json';
+  const json=JSON.stringify(state,null,2);
+  const file=new File([json],filename,{type:'application/json'});
+  // iOS Safari: Share > Save to Files allows the player to choose the exact folder.
+  // Must be called directly in a click handler, without awaits before navigator.share.
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Empire Origins — Save Backup'})
+      .then(()=>toast('Choose Save to Files to keep your backup'))
+      .catch(err=>{if(err?.name!=='AbortError') downloadBackup(file,filename)});
+  }else downloadBackup(file,filename);
+}
+function downloadBackup(file,filename){
+  const url=URL.createObjectURL(file),a=document.createElement('a');
+  a.href=url;a.download=filename;a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  toast('Download requested — check Safari Downloads');
+}
+
+function importSave(file){if(!file)return; if(file.size>4*1024*1024){toast('Save file is too large');return}const reader=new FileReader();reader.onerror=()=>toast('Could not read file');reader.onload=()=>{let s;try{s=JSON.parse(reader.result)}catch(e){toast('Invalid JSON save file');return}if(!validSave(s)){toast('Not a compatible Empire Origins save');return}if(!confirm('Load this empire? Your current local game will be replaced. Export a backup first if needed.'))return;
+// Record the imported empire before updating game references.
+try{localStorage.setItem(activeSaveKey,JSON.stringify(s))}catch(e){toast('Cannot import: browser storage unavailable');return}state=normalizeSave(s);let offline= reconcileElapsed(Date.now(),true);save(true);selected=null;mode='select';buildingType=null;pointerWorld=null;cam.x=innerWidth/2;cam.y=innerHeight/2-120;cam.z=1;$('panel').classList.remove('show');updateUI();cloudPending=!!cloudUser;cloudBlocked=!!cloudUser;if(offline)showOfflineReport(offline);else toast('Empire loaded successfully!');if(cloudUser)toast('Imported locally. Review Account before uploading to cloud.')};reader.readAsText(file)}
+const loaded=load();const launchOffline=loaded?reconcileElapsed(Date.now(),true):null;if(loaded)save(true);function resize(){const d=Math.min(devicePixelRatio||1,2);C.width=Math.round(innerWidth*d);C.height=Math.round(innerHeight*d);ctx.setTransform(d,0,0,d,0,0);if(!cam.x){cam.x=innerWidth/2;cam.y=innerHeight/2-120}}resize();window.addEventListener('resize',resize);
+function project(x,y){return {x:cam.x+(x-y)*TW*.5*cam.z,y:cam.y+(x+y-40)*TH*.5*cam.z}}
+function unproject(px,py){let a=(px-cam.x)/(TW*.5*cam.z),b=(py-cam.y)/(TH*.5*cam.z)+40;return {x:Math.floor((a+b)*.5),y:Math.floor((b-a)*.5)}}
+function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=.7;ctx.stroke()}}
+function diamond(x,y,fill,stroke){let p=project(x,y),a=TW*cam.z/2,b=TH*cam.z/2;poly([[p.x,p.y-b],[p.x+a,p.y],[p.x,p.y+b],[p.x-a,p.y]],fill,stroke)}
+function glyph(s,x,y,sz){ctx.font=`${sz}px -apple-system,system-ui,Segoe UI Emoji`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function draw(){const bg=ctx.createLinearGradient(0,0,0,innerHeight);bg.addColorStop(0,'#142a35');bg.addColorStop(1,'#0b171f');ctx.fillStyle=bg;ctx.fillRect(0,0,innerWidth,innerHeight);let cells=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){let p=project(x,y);if(p.x< -110||p.x>innerWidth+110||p.y<-90||p.y>innerHeight+120)continue;let t=tile(x,y);diamond(x,y,((x+y)%3===0?'#688755':((x+y)%3===1?'#78935b':'#6e8b58')), '#5d7850');cells.push({x,y,t,p,depth:x+y})}
+let items=[];for(let c of cells){if(c.t.type!=='grass'){let icon=c.t.type==='tree'?'🌳':c.t.type==='rock'?'🪨':'✨';items.push({depth:c.depth+.05,kind:'tile',x:c.p.x,y:c.p.y,icon})}}for(let b of state.buildings){let p=project(b.x+(b.size-1)/2,b.y+(b.size-1)/2);items.push({depth:b.x+b.y+b.size,kind:'building',x:p.x,y:p.y,b})}for(let w of state.workers){let p=project(w.x,w.y);items.push({depth:w.x+w.y+.5,kind:'worker',x:p.x,y:p.y,w})}for(let u of state.units){let p=project(u.x,u.y);items.push({depth:u.x+u.y+.6,kind:'unit',x:p.x,y:p.y,u})}for(let u of state.enemies){let p=project(u.x,u.y);items.push({depth:u.x+u.y+.65,kind:'enemy',x:p.x,y:p.y,u})}items.sort((a,b)=>a.depth-b.depth);for(let i of items){if(i.x< -100||i.x>innerWidth+100||i.y< -100||i.y>innerHeight+100)continue;if(i.kind==='tile')drawResource(i); else if(i.kind==='building'){let b=i.b;ctx.fillStyle=b.type==='town'?'#65564a':'#554c39';let k=cam.z;ctx.beginPath();ctx.ellipse(i.x,i.y+6*k,Math.max(8,b.size*TW*.24*k),Math.max(4,b.size*TH*.28*k),0,0,Math.PI*2);ctx.fill();drawStructure(i.x,i.y,b,k);if(selected?.kind==='building'&&selected.id===b.id)ring(i.x,i.y,25*k)}else if(i.kind==='unit'||i.kind==='enemy'){let u=i.u,enemy=i.kind==='enemy';drawUnitShape(i.x,i.y,enemy? 'enemy':u.type,cam.z);ctx.fillStyle='#151e23';ctx.fillRect(i.x-13*cam.z,i.y-25*cam.z,26*cam.z,4*cam.z);ctx.fillStyle=enemy?'#ee6464':'#63e5a4';ctx.fillRect(i.x-13*cam.z,i.y-25*cam.z,26*cam.z*Math.max(0,u.hp/u.maxHp),4*cam.z);if(selected?.kind===i.kind&&selected.id===u.id)ring(i.x,i.y,15*cam.z)}else{let w=i.w;drawUnitShape(i.x,i.y,'worker',cam.z);if(selected?.kind==='worker'&&selected.id===w.id)ring(i.x,i.y,14*cam.z)}}
+if(mode==='build'&&buildingType){let b=buildings[buildingType],pos=pointerWorld; if(pos&&inside(pos.x,pos.y)){let ok=canPlace(pos.x,pos.y,b.size);for(let dy=0;dy<b.size;dy++)for(let dx=0;dx<b.size;dx++)if(inside(pos.x+dx,pos.y+dy))diamond(pos.x+dx,pos.y+dy,ok?'#62ef8c77':'#fa646477','#e8f7da')}}}
+function drawResource(i){const k=cam.z,x=i.x,y=i.y,t=i.icon;ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle='#172c245e';ctx.beginPath();ctx.ellipse(0,4,13,5,0,0,7);ctx.fill();if(t==='🌳'){ctx.fillStyle='#654933';ctx.fillRect(-3,-13,6,17);for(const [cx,cy,r] of [[-7,-18,10],[6,-20,11],[0,-28,11]]){ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fillStyle=cy===-28?'#2e754c':'#255b42';ctx.fill();ctx.strokeStyle='#8daa66';ctx.lineWidth=1;ctx.stroke()}}else if(t==='🪨'){polyLocal([[-13,0],[-9,-15],[2,-20],[13,-10],[12,1]],'#89999a','#51686d');polyLocal([[-9,-15],[2,-20],[4,-6],[-13,0]],'#b2bcb0')}else{ctx.shadowColor='#f7d66a';ctx.shadowBlur=9;polyLocal([[-11,0],[-7,-10],[1,-19],[11,-11],[13,1]],'#dcae40','#fff0a2');polyLocal([[-7,-10],[1,-19],[3,-2]],'#fff19b')}ctx.restore()}
+function polyLocal(points,color,edge){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let j=1;j<points.length;j++)ctx.lineTo(points[j][0],points[j][1]);ctx.closePath();ctx.fillStyle=color;ctx.fill();if(edge){ctx.strokeStyle=edge;ctx.lineWidth=1;ctx.stroke()}}
+function drawStructure(x,y,b,k){const s=b.size;ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle='#16232699';ctx.beginPath();ctx.ellipse(0,6,14*s,7*s,0,0,7);ctx.fill();const half=s*10,height=10+s*4;ctx.fillStyle=b.type==='barracks'?'#6b5146':b.type==='town'?'#a29a7c':'#ad926e';ctx.fillRect(-half,-height,2*half,height);ctx.fillStyle='#6b5044';polyLocal([[-half-5,-height],[-half,-height-14],[0,-height-22],[half+5,-height]],b.type==='town'?'#666e77':b.type==='farm'?'#a88640':'#745953','#ddc39d');ctx.fillStyle='#2d3734';ctx.fillRect(-4,-12,8,12);if(s>2){ctx.fillStyle='#d8bd80';ctx.fillRect(-half+4,-height+4,5,6);ctx.fillRect(half-9,-height+4,5,6)}if(b.type==='storage'){ctx.fillStyle='#e1c18c';for(let j=0;j<3;j++){ctx.fillRect(-half+4+j*9,-8,7,8);ctx.strokeStyle='#785b3d';ctx.strokeRect(-half+4+j*9,-8,7,8)}}if(b.type==='lumber'){ctx.strokeStyle='#9b653e';ctx.lineWidth=3;for(let j=0;j<3;j++){ctx.beginPath();ctx.moveTo(-half+4+j*7,1);ctx.lineTo(-half+8+j*7,-8);ctx.stroke()}}if(b.type==='mine'){ctx.fillStyle='#657077';polyLocal([[-half-3,0],[-half+5,-17],[-half+18,-6]],'#718388','#9cb2b1')}if(b.type==='house'){ctx.fillStyle='#b2cbd0';ctx.fillRect(-half+4,-height+4,7,7)}if(b.type==='barracks'){ctx.fillStyle='#d8b76c';ctx.fillRect(half-4,-height-16,2,16);polyLocal([[half-2,-height-16],[half+12,-height-12],[half-2,-height-7]],'#a9433c')}if(b.type==='farm'){ctx.fillStyle='#e8ca6e';for(let j=0;j<3;j++)ctx.fillRect(-half+4+j*7,-4,3,6)}ctx.restore()}
+function drawUnitShape(x,y,type,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle='#122b2990';ctx.beginPath();ctx.ellipse(0,3,11,4,0,0,7);ctx.fill();let enemy=type==='enemy',worker=type==='worker';ctx.fillStyle=enemy?'#b9534d':worker?'#bd9a60':type==='archer'?'#729d60':type==='spear'?'#8299b5':'#6b8eb8';ctx.beginPath();ctx.roundRect(-6,-17,12,16,3);ctx.fill();ctx.strokeStyle=enemy?'#763e3e':'#394947';ctx.lineWidth=1;ctx.strokeRect(-6,-17,12,16);ctx.fillStyle=enemy?'#947a68':'#dbbb98';ctx.beginPath();ctx.arc(0,-21,6,0,7);ctx.fill();ctx.fillStyle=enemy?'#673c38':worker?'#d1ad56':'#77858d';polyLocal([[-7,-23],[0,-31],[7,-23]],ctx.fillStyle);ctx.strokeStyle=enemy?'#bc7865':'#c3c9c6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(7,-16);ctx.lineTo(type==='archer'?12:9,-30);ctx.stroke();if(type==='spear'){ctx.fillStyle='#d8dee0';polyLocal([[9,-30],[7,-36],[11,-36]],'#d8dee0')}ctx.restore()}
+function ring(x,y,r){ctx.save();ctx.shadowColor='#fbe49a';ctx.shadowBlur=9;ctx.beginPath();ctx.ellipse(x,y+6*cam.z,r,r*.35,0,0,Math.PI*2);ctx.strokeStyle='#ffe08c';ctx.lineWidth=2.4;ctx.stroke();ctx.restore()}
+function hitBuilding(x,y){return [...state.buildings].reverse().find(b=>x>=b.x&&x<b.x+b.size&&y>=b.y&&y<b.y+b.size)}
+function hitWorker(x,y){let w=state.workers.find(w=>Math.abs(w.x-x)<.9&&Math.abs(w.y-y)<.9);return w}
+function hitSoldier(x,y){return state.units.find(u=>Math.abs(u.x-x)<.9&&Math.abs(u.y-y)<.9)}function hitEnemy(x,y){return state.enemies.find(u=>Math.abs(u.x-x)<.9&&Math.abs(u.y-y)<.9)}
+function occupied(x,y){return !!hitBuilding(x,y)}
+function canPlace(x,y,size){if(x<1||y<1||x+size>=W-1||y+size>=H-1)return false;for(let j=0;j<size;j++)for(let i=0;i<size;i++){let xx=x+i,yy=y+j;if(tile(xx,yy).type!=='grass'||occupied(xx,yy))return false}return true}
+function afford(cost){return Object.entries(cost).every(([k,v])=>state.res[k]>=v)}function pay(cost){for(let [k,v] of Object.entries(cost))state.res[k]-=v;updateUI()}
+function workerCap(){return 5+state.buildings.filter(b=>b.type==='house').length*5}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('on');toastUntil=Date.now()+2300}
+function updateUI(){for(let r of ['wood','stone','food','gold'])$(r).textContent=({wood:'🪵',stone:'🪨',food:'🌾',gold:'🪙'}[r])+' '+Math.floor(state.res[r]);$('status').textContent=`👷 ${state.workers.length}/${workerCap()}  ·  🏘️ ${state.buildings.length} buildings · 🏗️ ${state.buildings.filter(b=>!isReady(b)).length} · ⏳ ${state.trainQueue.length}  ·  🛡️ ${state.units.length}  ·  🏆 ${state.victories}  ·  EMPIRE ORIGINS α0.7`;$('autoBtn').textContent='⚙️ Auto: '+(state.workers.every(w=>w.auto)?'ON':'MIX');let name='';if(selected){let v=(selected.kind==='worker'?state.workers:selected.kind==='unit'?state.units:selected.kind==='enemy'?state.enemies:state.buildings).find(e=>e.id===selected.id);if(v)name=selected.kind==='worker'?'👷 Worker #'+v.id:selected.kind==='unit'?'🛡️ '+(unitTypes[v.type]?.name||'Soldier')+' · '+Math.ceil(v.hp)+' HP':selected.kind==='enemy'?'⚔️ Enemy · '+Math.ceil(v.hp)+' HP':'🏠 '+(v.type==='town'?'Town Hall':buildings[v.type]?.name||v.type)+(v.readyAt&&v.readyAt>Date.now()?' · '+Math.ceil((v.readyAt-Date.now())/1000)+'s remaining':'')}$('selectedInfo').textContent=name;$('selectedInfo').classList.toggle('on',!!name);$('buildBtn').classList.toggle('active',mode==='build');$('workersBtn').classList.toggle('active',mode==='workers')}
+function messageFor(t){if(t==='tree')return 'wood';if(t==='rock')return 'stone';if(t==='gold')return 'gold';return null}
+function nearestSource(w,focus='any'){let best=null,dist=Infinity;for(let y=0;y<H;y++)for(let x=0;x<W;x++){let t=tile(x,y);if(t.amount<=0||!messageFor(t.type)||(focus!=='any'&&focus!=='manual'&&messageFor(t.type)!==focus))continue;let d=Math.abs(w.x-x)+Math.abs(w.y-y)+(t.type==='gold'?4:0);if(d<dist){dist=d;best={x,y}}}return best}
+function assign(w,x,y){let t=tile(x,y);if(t.type==='grass'){w.task={type:'move',x,y};w.auto=false;w.focus='manual';toast('Worker moving')}else{let resource=messageFor(t.type);if(resource){w.task={type:'gather',x,y,progress:0};w.auto=false;w.focus='manual';toast('Worker assigned to '+resource)}}}
+function update(dt){for(let w of state.workers){if(!w.task&&w.auto){let source=nearestSource(w,w.focus);if(source)w.task={type:'gather',...source,progress:0}}let task=w.task;if(!task)continue;let tx=task.x,ty=task.y;let diff=Math.hypot(w.x-tx,w.y-ty);if(diff>.18){let sp=Math.min(diff,dt*1.4);w.x+=(tx-w.x)/diff*sp;w.y+=(ty-w.y)/diff*sp;continue}w.x=tx;w.y=ty;if(task.type==='move'){w.task=null;continue}if(task.type==='gather'){task.progress=(task.progress||0)+dt;if(task.progress>=2.2){let t=tile(tx,ty),res=messageFor(t.type);if(res&&t.amount>0){let amount=addCapped(res,Math.min(5,t.amount));t.amount-=amount;if(t.amount<=0)t.type='grass'}w.task=null}}}
+// Farms produce while game is running, independent of worker AI. The first version intentionally simplifies food logistics.
+state._farmClock=(state._farmClock||0)+dt;if(state._farmClock>=10){state._farmClock-=10;addCapped('food',activeBuildingCount('farm')*8)}
+updateCombat(dt);}
+
+function near(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function approach(u,target,dt,stop){let d=near(u,target);if(d<=stop)return;let step=Math.min(d-stop,dt*u.speed);if(d>.001){u.x+=(target.x-u.x)/d*step;u.y+=(target.y-u.y)/d*step}}
+function healthUnit(u,type,extra={}){return {id:state.nextId++,type,x:20,y:20,hp:unitTypes[type].hp,maxHp:unitTypes[type].hp,attack:unitTypes[type].attack,range:unitTypes[type].range,speed:unitTypes[type].speed,interval:unitTypes[type].interval,cooldown:0,order:null,...extra}}
+function updateCombat(dt){
+for(let u of state.units){u.cooldown=Math.max(0,(u.cooldown||0)-dt);if(u.hp<=0)continue;let target=state.enemies.find(e=>e.id===u.order?.target&&e.hp>0);if(!target&&u.order?.target)u.order=null;
+if(!target&&u.order?.kind==='move'){approach(u,u.order,dt,.12);if(near(u,u.order)<.25)u.order=null;continue}
+if(!target){target=state.enemies.filter(e=>e.hp>0&&near(e,u)<Math.max(3,u.range+1)).sort((a,b)=>near(a,u)-near(b,u))[0]}
+if(target){approach(u,target,dt,u.range*.85);if(near(u,target)<=u.range&&u.cooldown<=0){target.hp-=u.attack;u.cooldown=u.interval}}}
+for(let e of state.enemies){e.cooldown=Math.max(0,(e.cooldown||0)-dt);if(e.hp<=0)continue;let target=state.units.filter(u=>u.hp>0).sort((a,b)=>near(a,e)-near(b,e))[0];if(target){approach(e,target,dt,e.range*.9);if(near(e,target)<=e.range&&e.cooldown<=0){target.hp-=e.attack;e.cooldown=e.interval}}else{let town=state.buildings.find(b=>b.type==='town');if(town){let t={x:town.x+1,y:town.y+1};approach(e,t,dt,1.5);if(near(e,t)<1.6&&e.cooldown<=0){e.cooldown=1.5;town.hp=Math.max(1,(town.hp??100)-3)}}}}
+state.units=state.units.filter(u=>u.hp>0);state.enemies=state.enemies.filter(e=>e.hp>0);
+if(state.battle&&state.enemies.length===0){state.battle=0;state.victories++;state.res.gold+=45;state.res.food+=35;toast('Victory! +45 gold +35 food');save(true)}
+}
+function recruitSoldier(type){
+ const t=unitTypes[type];if(!t)return;
+ const b=state.buildings.find(b=>b.type==='barracks'&&isReady(b));
+ if(!b)return toast('Finish a Barracks first');
+ if(!afford(t.cost))return toast('Not enough resources');
+ if(state.units.length+state.trainQueue.length>=25)return toast('Army limit: 25 units');
+ pay(t.cost);
+ const last=Math.max(Date.now(),...state.trainQueue.filter(q=>q.barracksId===b.id).map(q=>q.readyAt));
+ state.trainQueue.push({type,barracksId:b.id,readyAt:last+TRAIN_SECONDS[type]*1000});
+ toast(t.name+' queued · '+TRAIN_SECONDS[type]+'s');updateUI();save(true);
+}
+function spawnBattle(){if(state.battle&&state.enemies.length)return toast('Battle already active');if(!state.units.length)return toast('Train soldiers first');state.battle=1;let n=Math.min(3+state.victories,10);for(let i=0;i<n;i++){let e={id:state.nextId++,type:'enemy',x:30+(i%3),y:29+Math.floor(i/3),hp:66,maxHp:66,attack:7,range:1.15,speed:.58,interval:1.45,cooldown:0};state.enemies.push(e)}toast('Enemy raid! Select soldiers and tap an enemy');save(true)}
+
+function worldTap(x,y){pointerWorld={x,y};if(!inside(x,y))return;if(mode==='build'){let type=buildingType,b=buildings[type];if(!b){toast('Choose a building');return}if(!canPlace(x,y,b.size)){toast('Need empty land for this building');return}if(!afford(b.cost)){toast('Not enough resources');return}pay(b.cost);state.buildings.push({id:state.nextId++,type,x,y,size:b.size,hp:100,readyAt:Date.now()+BUILD_SECONDS[type]*1000});toast(b.name+' construction started ('+BUILD_SECONDS[type]+'s)');mode='select';buildingType=null;selected=null;updateUI();save(true);return}
+let w=hitWorker(x,y),b=hitBuilding(x,y),u=hitSoldier(x,y),enemy=hitEnemy(x,y);if(selected?.kind==='unit'&&!u){let soldier=state.units.find(a=>a.id===selected.id);if(soldier){soldier.order=enemy?{target:enemy.id}:{kind:'move',x,y};toast(enemy?'Attack ordered':'Moving soldier');return}}if(enemy){selected={kind:'enemy',id:enemy.id};toast('Enemy selected — choose your soldier to attack');return}if(u){selected={kind:'unit',id:u.id};mode='select';toast('Soldier selected — tap enemy or ground');return}if(selected?.kind==='worker'&&!w){let unit=state.workers.find(w=>w.id===selected.id);if(unit){assign(unit,x,y);updateUI();return}}if(w){selected={kind:'worker',id:w.id};mode='select';toast('Worker selected — tap resource or location');return}if(b){selected={kind:'building',id:b.id};mode='select';toast((b.type==='town'?'Town Hall':buildings[b.type]?.name)+' selected');return}selected=null}
+let pointerWorld=null;
+function showPanel(title,body){managementOpen=false;$('panel').onclick=null;$('panel').innerHTML='<h3>'+title+'</h3>'+body+'<div class="line"></div><button id="closePanel">Close</button>';$('panel').classList.add('show');$('closePanel').onclick=()=>{managementOpen=false;$('panel').classList.remove('show')}}
+
+function fmtTime(seconds){seconds=Math.max(0,Math.ceil(seconds));if(!seconds)return 'Ready';const d=Math.floor(seconds/86400),h=Math.floor((seconds%86400)/3600),m=Math.floor((seconds%3600)/60),s=seconds%60;return [d?d+'d':null,h?h+'h':null,m?m+'m':null,!d&&!h?s+'s':null].filter(Boolean).join(' ')}
+function dashboardHTML(){
+ const now=Date.now(),tabs=[['workers','👷 Workers'],['buildings','🏗️ Buildings'],['army','🛡️ Army']];
+ let html='<div class="dashboard-tabs">'+tabs.map(([k,n])=>`<button data-tab="${k}" class="${managementTab===k?'chosen active':''}">${n}</button>`).join('')+'</div>';
+ if(managementTab==='workers'){
+  const counts={any:0,wood:0,stone:0,gold:0,manual:0};for(const w of state.workers)counts[w.auto?(w.focus==='wood'||w.focus==='stone'||w.focus==='gold'?w.focus:'any'):'manual']++;
+  html+=`<div class="help">Assign each villager to a resource. These assignments are saved and respected while offline. <b>Auto</b> chooses the nearest available deposit. Food comes from farms.</div><p class="dash-muted">👷 ${state.workers.length}/${workerCap()} villagers · 🪵 ${counts.wood} · 🪨 ${counts.stone} · 🪙 ${counts.gold} · 🔁 ${counts.any} · ✋ ${counts.manual}</p>`;
+  for(const w of state.workers){const focus=w.auto?(w.focus||'any'):'manual';const job=w.task?.type==='gather'?`Gathering ${messageFor(inside(w.task.x,w.task.y)?tile(w.task.x,w.task.y).type:null)||'resource'}`:w.task?.type==='move'?'Moving':w.auto?'Seeking resource':'Idle / waiting';
+   html+=`<div class="dash-card"><div class="dash-row"><strong>👷 Villager #${w.id}</strong><span class="dash-muted">${job}</span></div><div class="dash-actions">${[['any','🔁 Auto'],['wood','🪵 Wood'],['stone','🪨 Stone'],['gold','🪙 Gold'],['manual','✋ Manual']].map(([v,n])=>`<button data-focus="${v}" data-worker-id="${w.id}" class="${focus===v?'chosen':''}">${n}</button>`).join('')}</div></div>`;
+  }
+ }else if(managementTab==='buildings'){
+  const under=state.buildings.filter(b=>!isReady(b,now));const ready=state.buildings.length-under.length;
+  html+=`<div class="help">${ready} completed · ${under.length} under construction. Buildings finish using real-world elapsed time, including while the app is closed.</div>`;
+  html+=under.length?'': '<div class="dash-empty">No construction in progress.</div>';
+  for(const b of under){const total=(BUILD_SECONDS[b.type]||60)*1000;const remain=b.readyAt-now;const pct=Math.max(0,Math.min(100,100-remain/total*100));html+=`<div class="dash-card"><div class="dash-row"><strong>🏗️ ${buildings[b.type]?.name||b.type}</strong><span>${fmtTime(remain/1000)}</span></div><div class="dash-progress"><i style="width:${pct.toFixed(1)}%"></i></div></div>`}
+  const counts={};for(const b of state.buildings){if(isReady(b,now)){const name=b.type==='town'?'Town Hall':buildings[b.type]?.name||b.type;counts[name]=(counts[name]||0)+1}}
+  html+='<div class="dash-card"><strong>Completed buildings</strong>'+Object.entries(counts).map(([n,v])=>`<div class="dash-row"><span>${n}</span><b>×${v}</b></div>`).join('')+'</div>';
+ }else{
+  html+=`<div class="help">${state.units.length} trained soldiers · ${state.trainQueue.length} in training. Training costs are paid in advance; queued units finish while offline.</div>`;
+  const queue=[...state.trainQueue].sort((a,b)=>a.readyAt-b.readyAt);html+=queue.length?'':'<div class="dash-empty">No soldiers currently training. Open Army to recruit.</div>';
+  for(const q of queue){const name=unitTypes[q.type]?.name||q.type;const duration=TRAIN_SECONDS[q.type]||30;const rem=q.readyAt-now;const pct=Math.max(0,Math.min(100,100-rem/(duration*1000)*100));html+=`<div class="dash-card"><div class="dash-row"><strong>🛡️ ${name}</strong><span>${fmtTime(rem/1000)}</span></div><div class="dash-progress"><i style="width:${pct.toFixed(1)}%"></i></div></div>`}
+  html+=`<div class="dash-card"><div class="dash-row"><span>Army limit</span><strong>${state.units.length+state.trainQueue.length}/25</strong></div><div class="dash-row"><span>Victories</span><strong>${state.victories}</strong></div><div class="dash-actions"><button data-open-army="1">➕ Train units</button></div></div>`;
+ }
+ return html;
+}
+function renderManagement(){if(!managementOpen)return;const p=$('panel'),scroll=p.scrollTop;p.innerHTML='<h3>📊 Empire Management</h3>'+dashboardHTML()+'<div class="line"></div><button data-close-dashboard="1">Close</button>';p.scrollTop=scroll;lastManagementPaint=Date.now();}
+function openManagement(tab){managementTab=tab||'workers';managementOpen=true;$('panel').classList.add('show');$('panel').onclick=e=>{const b=e.target.closest('button');if(!b||!managementOpen)return;if(b.dataset.tab){managementTab=b.dataset.tab;$('panel').scrollTop=0;renderManagement();return}if(b.dataset.focus){const w=state.workers.find(x=>x.id===Number(b.dataset.workerId));if(!w)return;const focus=b.dataset.focus;w.auto=focus!=='manual';w.focus=focus;w.task=null;save(true);updateUI();renderManagement();toast('Villager #'+w.id+' → '+focus);return}if(b.dataset.openArmy){managementOpen=false;$('panel').onclick=null;$('armyBtn').click();return}if(b.dataset.closeDashboard){managementOpen=false;$('panel').onclick=null;$('panel').classList.remove('show')}};renderManagement()}
+
+// Firebase cloud accounts: legacy save stays intact; authenticated profiles
+// get their own local key, and cloud writes require matching revision.
+function copyGame(){return JSON.parse(JSON.stringify(state))}
+function accountLocalKey(uid){return 'empire-origins-account-'+uid}
+function errorMessage(e){const s=String(e?.code||e?.message||e);if(s.includes('auth/email-already-in-use'))return 'Email already registered.';if(s.includes('auth/invalid-credential'))return 'Incorrect email or password.';if(s.includes('auth/weak-password'))return 'Password too weak (minimum 6 characters).';if(s.includes('auth/invalid-email'))return 'Invalid email.';if(s.includes('auth/too-many-requests'))return 'Too many attempts. Try later.';if(s.includes('permission-denied'))return 'Permission denied. Check Firestore Rules.';if(s.includes('CLOUD_CONFLICT'))return 'Cloud changed on another device. Select which save to keep.';if(s.includes('unavailable')||s.includes('network'))return 'Connection unavailable. Local save is safe.';return s.slice(0,180)}
+function adoptEmpire(s){if(!validSave(s))throw Error('Invalid game save');state=normalizeSave(JSON.parse(JSON.stringify(s)));let report=reconcileElapsed(Date.now(),true);selected=null;mode='select';buildingType=null;cam.x=innerWidth/2;cam.y=innerHeight/2-120;cam.z=1;save(true);updateUI();if(report)showOfflineReport(report)}
+function setAccountStatus(){const btn=$('accountBtn');btn.textContent=cloudUser?'☁️ '+(cloudWorking?'Syncing':cloudBlocked?'Review':'Account'):'👤 Account';}
+async function cloudSync(manual=false){
+ if(!cloudUser||cloudWorking||cloudBlocked||cloudPaused||!navigator.onLine)return;
+ cloudWorking=true;setAccountStatus();try{
+  save(true);const result=await window.empireCloud.write(cloudUser.uid,copyGame(),cloudRev);
+  cloudRev=result.revision;cloudLastSync=Date.now();cloudPending=false;
+  localStorage.setItem('empire-origins-cloudrev-'+cloudUser.uid,String(cloudRev));
+  if(manual)toast('☁️ Cloud saved successfully');
+ }catch(e){cloudPending=true;if(String(e).includes('CLOUD_CONFLICT')){cloudBlocked=true;toast('Cloud conflict. Open Account to choose a save.')}else if(manual)toast(errorMessage(e))}
+ finally{cloudWorking=false;setAccountStatus()}
+}
+function profileLocal(){const s=localStorage.getItem(accountLocalKey(cloudUser.uid));if(!s)return null;try{const parsed=JSON.parse(s);return validSave(parsed)?parsed:null}catch{return null}}
+async function resolveAccount(first=false){
+ if(!cloudUser)return;
+ cloudBlocked=true;cloudPaused=true;setAccountStatus();
+ let remote;
+ try{remote=await window.empireCloud.read(cloudUser.uid)}catch(e){
+   const local=profileLocal();if(local){activeSaveKey=accountLocalKey(cloudUser.uid);adoptEmpire(local);cloudBlocked=false;cloudPaused=false;cloudPending=true;toast('Offline: using this account’s saved empire. Cloud will sync when connected.')}
+   else {toast('Cannot reach cloud. Your previous game remains safe.');await window.empireCloud.logout()}
+   setAccountStatus();return;
+ }
+ if(!cloudUser)return;
+ const stored=profileLocal();const local=stored||((first&&!localStorage.getItem('empire-origins-account-linked-'+cloudUser.uid))?copyGame():null);
+ const priorRevision=Number(localStorage.getItem('empire-origins-cloudrev-'+cloudUser.uid)||0);
+ const possiblePending=stored && priorRevision!==remote?.revision;
+ // Returning session: identical cloud revision + account cache can use locally with no confirmation.
+ if(remote&&stored&&!possiblePending){cloudRev=remote.revision;activeSaveKey=accountLocalKey(cloudUser.uid);adoptEmpire(stored);cloudBlocked=false;cloudPaused=false;cloudPending=false;setAccountStatus();toast('☁️ Signed in — empire ready');return}
+ if(!remote&&!local){activeSaveKey=accountLocalKey(cloudUser.uid);newGame();save(true);cloudRev=0;cloudBlocked=false;cloudPaused=false;cloudPending=true;setAccountStatus();await cloudSync(true);return}
+ const remoteText=remote?'Cloud empire found ('+remote.state.workers.length+' workers, '+remote.state.buildings.length+' buildings).':'No cloud empire exists for this account.';
+ const localText=local?'Local empire available ('+local.workers.length+' workers, '+local.buildings.length+' buildings).':'No local empire for this account.';
+ let body='<div class="account-warning"><b>Choose which progress to keep.</b> We never silently replace a local empire with a cloud save. Export a JSON backup first if needed.</div>'+
+ '<p>'+remoteText+'</p><p>'+localText+'</p><div class="panel-actions">'+
+ (remote?'<button id="chooseCloud">☁️ Load Cloud</button>':'')+
+ (local?'<button id="chooseLocal" class="primary">📱 Use iPhone Empire</button>':'')+
+ '<button id="cancelAccount">Cancel / Sign Out</button></div>';
+ showPanel('🔐 Link your empire',body);cloudBlocked=true;cloudPaused=true;setAccountStatus();
+ if($('chooseCloud'))$('chooseCloud').onclick=()=>{cloudRev=remote.revision;activeSaveKey=accountLocalKey(cloudUser.uid);adoptEmpire(remote.state);localStorage.setItem('empire-origins-cloudrev-'+cloudUser.uid,String(cloudRev));localStorage.setItem('empire-origins-account-linked-'+cloudUser.uid,'1');cloudBlocked=false;cloudPaused=false;cloudPending=false;$('panel').classList.remove('show');setAccountStatus();toast('☁️ Cloud empire loaded')};
+ if($('chooseLocal'))$('chooseLocal').onclick=async()=>{activeSaveKey=accountLocalKey(cloudUser.uid);adoptEmpire(local);cloudRev=remote?.revision||0;cloudBlocked=false;cloudPaused=false;cloudPending=true;localStorage.setItem('empire-origins-account-linked-'+cloudUser.uid,'1');$('panel').classList.remove('show');setAccountStatus();await cloudSync(true)};
+ $('cancelAccount').onclick=()=>window.empireCloud.logout();
+}
+function accountPanel(){
+ if(!window.empireCloud?.configured){showPanel('☁️ Cloud setup needed','<div class="account-warning">To activate online accounts, enter your Firebase web app settings in <b>firebase-config.js</b> and publish Firestore Rules. The game and local saves still work without Firebase.</div>');return}
+ if(!cloudUser){
+ showPanel('👤 Empire Account','<p>Log in or create an account to keep your empire in the cloud. Your original local save will not be erased.</p><label class="small">Email</label><input class="account-field" id="authEmail" type="email" autocomplete="email" placeholder="email@example.com"/><label class="small">Password</label><input class="account-field" id="authPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters"/><div class="panel-actions"><button id="authLogin" class="primary">Log in</button><button id="authRegister">Create account</button><button id="authReset">Reset password</button></div><p class="small">Requires internet for sign-in. Never share your password.</p>');
+ const handle=async kind=>{const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email){toast('Enter your email');return}try{if(kind==='reset'){await window.empireCloud.resetPassword(email);toast('Password reset email requested');return}if(!password){toast('Enter your password');return}if(kind==='register')await window.empireCloud.register(email,password);else await window.empireCloud.login(email,password)}catch(e){toast(errorMessage(e))}};
+ $('authLogin').onclick=()=>handle('login');$('authRegister').onclick=()=>handle('register');$('authReset').onclick=()=>handle('reset');return;
+ }
+ showPanel('☁️ Cloud Account','<div class="account-status">Signed in as <b>'+escapeAccount(cloudUser.email||'Player')+'</b><p>Local save: '+(cloudBlocked?'Needs review':'Active')+' · Cloud: '+(cloudBlocked?'Conflict / awaiting choice':cloudWorking?'Syncing':cloudPending?'Not yet synced':'Synced')+'</p></div><div class="panel-actions"><button id="cloudSaveNow" class="primary">☁️ Sync Now</button><button id="cloudResolve">🔄 Choose Save</button><button id="cloudLogout">Sign Out</button></div><p class="small">Export a JSON backup before switching devices. Cloud saves are private per account. Offline battles do not progress.</p>');
+ $('cloudSaveNow').onclick=()=>{if(cloudBlocked)return toast('Choose your save first');cloudSync(true)};
+ $('cloudResolve').onclick=()=>resolveAccount(true);
+ $('cloudLogout').onclick=()=>window.empireCloud.logout();
+}
+function escapeAccount(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('accountBtn').onclick=accountPanel;
+window.addEventListener('empire-cloud-auth',async e=>{
+ const user=e.detail?.user||null;
+ if(!user){cloudUser=null;cloudRev=0;cloudBlocked=false;cloudPaused=false;cloudPending=false;activeSaveKey=SAVE;load();updateUI();setAccountStatus();$('panel').classList.remove('show');return}
+ if(cloudUser?.uid===user.uid)return;
+ // Legacy empire is saved separately before changing the save namespace.
+ if(!cloudUser)save(true);
+ cloudUser=user;setAccountStatus();await resolveAccount(true);
+});
+window.addEventListener('online',()=>{if(cloudUser&&!cloudBlocked){cloudPending=true;cloudSync(false)}});
+
+$('manageBtn').onclick=()=>openManagement('workers');
+
+$('buildBtn').onclick=()=>{mode='build';selected=null;let html='<p>Choose a building, then tap an empty spot on the map.</p>';for(let [key,b] of Object.entries(buildings)){html+=`<button data-build="${key}">${b.emoji} ${b.name} · ${BUILD_SECONDS[key]}s<br><span class="small">${Object.entries(b.cost).map(([r,n])=>r+': '+n).join(' · ')}</span></button>`}showPanel('Build',html);document.querySelectorAll('[data-build]').forEach(bt=>bt.onclick=()=>{buildingType=bt.dataset.build;$('panel').classList.remove('show');toast('Tap an empty area to build '+buildings[buildingType].name);updateUI()});updateUI()};
+$('workersBtn').onclick=()=>{mode='workers';selected=null;let body='<p>Select a worker below to give manual orders. An idle worker in Auto mode gathers resources automatically.</p>';for(let w of state.workers){body+=`<button data-worker="${w.id}">👷 #${w.id} · ${w.auto?'Auto':'Manual'}</button>`}showPanel('Workers',body);document.querySelectorAll('[data-worker]').forEach(bt=>bt.onclick=()=>{let w=state.workers.find(w=>w.id===+bt.dataset.worker);selected={kind:'worker',id:w.id};mode='select';$('panel').classList.remove('show');toast('Worker #'+w.id+' selected. Tap terrain to command.');updateUI()});updateUI()};
+$('armyBtn').onclick=()=>{let body='<p>Build a Barracks, train units, then tap a soldier and an enemy to attack. Tap empty ground to move.</p>';for(let [key,t] of Object.entries(unitTypes))body+=`<button data-train="${key}">${t.emoji} ${t.name} · ${TRAIN_SECONDS[key]}s<br><span class="small">${Object.entries(t.cost).map(([r,n])=>r+': '+n).join(' · ')}</span></button>`;body+=`<p>Training queue: ${state.trainQueue.length} · Completed units: ${state.units.length}</p>`;showPanel('Train your army',body);document.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>recruitSoldier(b.dataset.train))};$('raidBtn').onclick=spawnBattle;
+$('recruitBtn').onclick=()=>{if(state.workers.length>=workerCap())return toast('Build houses to expand worker capacity');if(state.res.food<50)return toast('Need 50 food');state.res.food-=50;let id=state.nextId++;state.workers.push({id,x:20+Math.random(),y:19+Math.random(),task:null,carry:0,auto:true,focus:'any'});toast('Villager recruited!');updateUI();save(true)};
+$('autoBtn').onclick=()=>{let turnOn=!state.workers.every(w=>w.auto);for(let w of state.workers){w.auto=turnOn;w.focus=turnOn?'any':'manual';w.task=null}toast(turnOn?'All workers set to Auto':'All workers set to Manual');updateUI()};$('saveBtn').onclick=()=>{
+  save(true);
+  showPanel('💾 Save Manager',`<div class="help"><b>Save Now</b> keeps progress inside this browser — no file appears in Files.<br><b>Export Backup</b> makes a .json file. On iPhone, use <b>Share → Save to Files</b> and choose a folder.<br><b>Load Save</b> restores a JSON file you saved earlier.</div><div class="panel-actions"><button id="saveNow">💾 Save Now</button><button id="export" class="primary">📤 Export Backup</button><button id="importButton">📂 Load Save</button><button id="offlineInfo">🌙 Offline Rules</button><button id="reset">🗑️ New Game</button></div><p class="small">Tip: Safari downloads are usually in Files → Browse → Downloads. Export a backup before switching browsers or clearing website data.</p><input id="importFile" type="file" accept=".json,application/json" style="display:none"/>`);
+  $('saveNow').onclick=()=>{save();if(cloudUser)cloudSync(true)};$('offlineInfo').onclick=()=>showPanel('🌙 Offline Rules','<div class="help">Unlimited offline time: farms, automatic workers, construction and paid training queues continue by timestamp. Harvest stops when resource nodes are empty or storage fills. Enemies do not fight offline. Phone clock changes can affect results.</div>');
+  $('export').onclick=exportBackup;
+  $('importButton').onclick=()=>$('importFile').click();
+  $('importFile').onchange=e=>{importSave(e.target.files?.[0]);e.target.value=''};
+  $('reset').onclick=()=>{if(confirm('Erase this empire and start again? Export a backup first.')){newGame();selected=null;mode='select';save(true);$('panel').classList.remove('show');updateUI()}};
+};
+
+let pointers=new Map(),wasPinch=false;C.addEventListener('pointerdown',e=>{C.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){drag={x:e.clientX,y:e.clientY,baseX:cam.x,baseY:cam.y,moved:false};wasPinch=false}else{wasPinch=true;drag=null;let v=[...pointers.values()];pinchDist=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)}});C.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size>=2){let v=[...pointers.values()],dist=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y);if(pinchDist>0)cam.z=Math.max(.55,Math.min(2.0,cam.z*dist/pinchDist));pinchDist=dist;return}if(drag){let dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>7)drag.moved=true;if(drag.moved){cam.x=drag.baseX+dx;cam.y=drag.baseY+dy}}pointerWorld=unproject(e.clientX,e.clientY)});C.addEventListener('pointerup',e=>{let tap=drag&&!drag.moved&&!wasPinch;pointers.delete(e.pointerId);if(tap){let p=unproject(e.clientX,e.clientY);worldTap(p.x,p.y)}if(!pointers.size){drag=null;wasPinch=false;pinchDist=0}});C.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);drag=null;wasPinch=false});
+function frame(now){let dt=Math.min((now-lastTime)/1000,.08);lastTime=now;if(!document.hidden){update(dt);for(const b of state.buildings){if(b.readyAt&&b.readyAt<=Date.now())b.readyAt=0;}for(let i=state.trainQueue.length-1;i>=0;i--){let q=state.trainQueue[i],b=state.buildings.find(b=>b.id===q.barracksId);if(q.readyAt<=Date.now()&&b&&isReady(b)){state.units.push(healthUnit(null,q.type,{x:Math.min(W-1,b.x+b.size),y:Math.min(H-1,b.y+b.size)}));state.trainQueue.splice(i,1);toast(unitTypes[q.type].name+' ready!')}}state.lastSimulatedAt=Date.now();}draw();if(now-lastView>300){updateUI();lastView=now}if(managementOpen&&Date.now()-lastManagementPaint>1000){renderManagement()}if(now-lastAutosave>15000){save(true);lastAutosave=now}if(cloudUser&&!cloudBlocked&&!cloudPaused&&!cloudWorking&&Date.now()-cloudLastSync>90000){cloudSync(false)}if(toastUntil&&Date.now()>toastUntil){$('toast').classList.remove('on');toastUntil=0}requestAnimationFrame(frame)}document.addEventListener('visibilitychange',()=>{if(document.hidden){state.lastSimulatedAt=Date.now();save(true)}else{const report=reconcileElapsed(Date.now(),true);save(true);lastTime=performance.now();if(report)showOfflineReport(report)}});window.addEventListener('pagehide',()=>save(true));updateUI();requestAnimationFrame(frame);if(launchOffline)showOfflineReport(launchOffline);else if(loaded)toast('Welcome back to your empire!');else toast('Welcome! Select a worker or build your village.');
+})();
+</script><script type="module" src="./firebase-cloud.js"></script></body></html>
