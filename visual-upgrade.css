@@ -1,0 +1,33 @@
+/* EMPIRE ORIGINS - visual pack 0.8. Does not touch game state or Firebase. */
+:root{--ui-gold:#e9be70;--ui-dark:#111e22;--ui-border:#9d8053;--ui-cream:#fff4d9;--ui-green:#8ac29b;}
+html,body{background:#152922;color:var(--ui-cream)}
+#game{filter:saturate(1.16) contrast(1.05)}
+#brand{left:11px;top:calc(env(safe-area-inset-top) + 6px);font-size:11px;letter-spacing:1.4px;padding:7px 11px;border:1px solid #efc77d;box-shadow:0 2px 0 #694b2c,0 9px 22px #05120eb8;background:linear-gradient(115deg,#29382af5,#15282df2);text-shadow:0 1px 3px #000;}
+#accountBtn{right:10px;top:calc(env(safe-area-inset-top) + 6px);border:1px solid #e8bd75;border-radius:12px;background:linear-gradient(150deg,#4c533f,#233a3a);color:#fff2cb;box-shadow:0 3px 0 #2a362b,0 7px 13px #0009;font-size:11px;min-height:31px}
+#top{top:calc(env(safe-area-inset-top) + 47px);gap:5px;left:7px;right:7px}
+.res{position:relative;min-height:43px;display:flex;align-items:center;justify-content:center;white-space:nowrap;letter-spacing:.1px;font-size:clamp(11px,3.15vw,15px);border-radius:10px;border:1px solid #b1945b;background:linear-gradient(155deg,#354333f6 0%,#1a2e2bf8 43%,#13242af8 100%);color:#fff5d8;box-shadow:inset 0 1px #fff3,inset 0 -2px #08110d,0 5px 14px #0009;}
+.res:after{content:"";position:absolute;inset:2px;border-radius:7px;border:1px solid #ffffff13;pointer-events:none}
+#status{top:calc(env(safe-area-inset-top) + 96px);left:9px;right:9px;padding:5px 7px;border-radius:7px;font-size:10px;line-height:1.5;letter-spacing:.03em;background:#091b1cb0;border:1px solid #99a27c44;color:#f4e5c2;text-shadow:0 1px 3px #000;}
+#selectedInfo{top:calc(env(safe-area-inset-top) + 134px);right:8px;max-width:200px;padding:10px 12px;font-size:12px;line-height:1.4;border-radius:12px;border:1px solid #e3bd74;background:linear-gradient(160deg,#263a34f5,#122326fa);box-shadow:0 6px 24px #0009, inset 0 1px #fff2;color:#fff0c5}
+#hint{bottom:calc(env(safe-area-inset-bottom) + 116px);font-size:10px;text-shadow:0 2px 5px #000,0 0 10px #000}
+#toolbar{left:7px;right:7px;bottom:calc(env(safe-area-inset-bottom) + 6px);border-radius:19px;border:1px solid #c8a46c;gap:6px;padding:9px;background:linear-gradient(158deg,#354436f9,#192e2dfb 53%,#17232afb);box-shadow:inset 0 1px #fff3,0 12px 32px #000d;}
+#toolbar button{min-height:47px;padding:7px 2px;border:1px solid #718a78;border-bottom:2px solid #1b2729;border-radius:10px;background:linear-gradient(170deg,#4d6359,#263d3d 60%,#1e3036);color:#fff4da;font-size:clamp(10px,2.6vw,12px);line-height:1.2;box-shadow:inset 0 1px #fff2,0 3px 7px #0006;}
+#toolbar button:active{filter:brightness(1.25);transform:translateY(2px)}
+#toolbar #raidBtn{background:linear-gradient(160deg,#a15d46,#633b34 60%,#442f36);border-color:#cf9972}
+#toolbar #saveBtn{background:linear-gradient(160deg,#92743d,#5c4c30 65%,#3e352c);border-color:#e4c478}
+#toolbar #manageBtn{background:linear-gradient(160deg,#43816c,#235146 65%,#203a3b);border-color:#8fc8a0}
+#toolbar button.active{border-color:#ffdc8a;background:linear-gradient(160deg,#6c855d,#395d47);box-shadow:inset 0 1px #fff5,0 0 11px #e9be7044}
+#panel{bottom:calc(env(safe-area-inset-bottom) + 118px);max-height:min(60dvh,650px);border:1px solid #e5bf7c;border-radius:20px;padding:17px;background:linear-gradient(165deg,#34453cfb,#1b3233fd 50%,#14242afc);box-shadow:0 18px 54px #000e,inset 0 1px #fff4;}
+#panel h3{font-size:20px;font-weight:850;letter-spacing:.2px;color:#f6d68c;text-shadow:0 2px 5px #000a}
+#panel p{color:#e0e7d7}
+#panel button{background:linear-gradient(155deg,#50665b,#2c4642);border:1px solid #8b9c84;color:#fff6df;box-shadow:inset 0 1px #fff2,0 3px 7px #0006}
+#panel .dash-card,#panel .help{background:linear-gradient(135deg,#213c38,#172d31);border:1px solid #768e74;border-radius:14px;padding:12px;box-shadow:inset 0 1px #fff1}
+#panel .dash-card strong{color:#f6d493}
+#panel .dash-progress{height:9px;background:#0d2224;border:1px solid #3b5e54}
+#panel .dash-progress i{background:linear-gradient(90deg,#b98946,#f2d48a)}
+#panel .dashboard-tabs button.chosen,#panel button.chosen{background:linear-gradient(150deg,#748853,#3b694a);border-color:#f1d18a}
+#panel input.account-field{background:#101f23;border-color:#869987;border-radius:11px;color:#fffaf0;}
+#toast{background:linear-gradient(160deg,#31534a,#1b3837);border:1px solid #e7c17c;color:#fff6df;border-radius:13px;box-shadow:0 9px 28px #000c;font-size:13px}
+#visual-version{position:fixed;left:11px;bottom:calc(env(safe-area-inset-bottom) + 119px);pointer-events:none;font-size:9px;z-index:1;color:#ffebbb9c;text-shadow:0 2px 5px #000}
+@media(max-width:370px){#toolbar{gap:4px;padding:6px}#toolbar button{font-size:10px;min-height:44px}#panel{bottom:calc(env(safe-area-inset-bottom) + 107px)}#status{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
